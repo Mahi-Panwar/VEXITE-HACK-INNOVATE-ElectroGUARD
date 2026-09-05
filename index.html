@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<!-- Side Slidebar Drawer -->
+<!-- Side Slidebar Drawer (All Page Navigation) -->
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 <aside class="sidebar-drawer" id="sidebar-drawer">
   <div class="sidebar-header">
@@ -25,7 +25,7 @@
         <p style="font-size:11px">Grid Safety Platform</p>
       </div>
     </div>
-    <button class="sidebar-close-btn" id="sidebar-close-btn">
+    <button class="sidebar-close-btn" id="sidebar-close-btn" title="Close Menu">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </button>
   </div>
@@ -43,7 +43,7 @@
 
   <header class="topbar">
     <div style="display:flex;align-items:center;gap:12px">
-      <button class="hamburger-btn" id="hamburger-btn" title="Open Navigation Menu">
+      <button class="hamburger-btn" id="hamburger-btn" title="Open Navigation Sidebar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="brand">
@@ -68,8 +68,7 @@
     </div>
   </header>
 
-  <nav class="tabs" id="tabs"></nav>
-  <main id="content"></main>
+  <main id="content" style="margin-top:20px"></main>
 </div>
 
 <!-- Login & Signup Modal Popup -->

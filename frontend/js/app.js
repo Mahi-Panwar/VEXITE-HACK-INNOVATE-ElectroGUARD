@@ -19,22 +19,6 @@ export function navigateToTab(tabId) {
   render();
 }
 
-function renderTabs() {
-  const nav = document.getElementById('tabs');
-  if (!nav) return;
-  nav.innerHTML = TABS.map(t => `
-    <button class="tab-btn ${state.tab === t.id ? 'active' : ''}" data-tab="${t.id}">
-      ${icon(t.icon)}<span>${t.label}</span>
-    </button>`).join('');
-  
-  nav.querySelectorAll('.tab-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      state.tab = b.dataset.tab;
-      render();
-    });
-  });
-}
-
 function renderSidebar() {
   const sidebarNav = document.getElementById('sidebar-nav');
   if (!sidebarNav) return;
@@ -67,7 +51,6 @@ function updateUserBadge() {
 }
 
 export function render() {
-  renderTabs();
   renderSidebar();
   updateUserBadge();
   const c = document.getElementById('content');
