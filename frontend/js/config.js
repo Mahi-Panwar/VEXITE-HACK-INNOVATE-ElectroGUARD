@@ -1,11 +1,12 @@
 export const TABS = [
   { id: 'home', label: 'Home', icon: 'home' },
-  { id: 'login', label: 'Login / OTP', icon: 'user' },
+  { id: 'dashboard', label: 'My Dashboard', icon: 'grid' },
+  { id: 'login', label: 'Login / Account', icon: 'user' },
   { id: 'report', label: 'Report Fault', icon: 'camera' },
   { id: 'indoor', label: 'Indoor Assistant', icon: 'plug' },
   { id: 'predict', label: 'Outage Predictor', icon: 'cloud' },
-  { id: 'rewards', label: 'Reports & Rewards', icon: 'star' },
-  { id: 'ops', label: 'Utility Dashboard', icon: 'grid' },
+  { id: 'rewards', label: 'Leaderboard & Rewards', icon: 'star' },
+  { id: 'ops', label: 'Utility Console', icon: 'grid' },
 ];
 
 export const SECTORS = [

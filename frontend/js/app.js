@@ -6,6 +6,7 @@ import { loadPersonal, loadBackendUrl, loadShared, setBackendUrl, updateBackendC
 import { openAuthModal, closeAuthModal } from './components/modal.js';
 
 import { renderHome } from './views/home.js';
+import { renderDashboard } from './views/dashboard.js';
 import { renderLogin } from './views/login.js';
 import { renderReport } from './views/report.js';
 import { renderIndoor } from './views/indoor.js';
@@ -62,6 +63,7 @@ export function render() {
   }
 
   if (state.tab === 'home') return renderHome(c, navigateToTab, render);
+  if (state.tab === 'dashboard') return renderDashboard(c, navigateToTab, render);
   if (state.tab === 'login') return renderLogin(c, navigateToTab);
   if (state.tab === 'report') return renderReport(c);
   if (state.tab === 'indoor') return renderIndoor(c);

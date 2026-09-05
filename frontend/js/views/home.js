@@ -24,6 +24,7 @@ export function renderHome(container, navigateToTab, renderApp) {
         <div class="hero-actions">
           <button class="btn btn-primary" id="home-btn-report">${icon('camera')} Report a fault</button>
           <button class="btn" id="home-btn-indoor">${icon('plug')} Indoor issue?</button>
+          <button class="btn" id="home-btn-dash">${icon('grid')} My Dashboard</button>
           ${!isLogged ? `<button class="btn" id="home-btn-login-popup">${icon('user')} Login / Sign Up</button>` : ''}
         </div>
         <div class="stat-row">
@@ -98,6 +99,7 @@ export function renderHome(container, navigateToTab, renderApp) {
 
   document.getElementById('home-btn-report').addEventListener('click', () => navigateToTab('report'));
   document.getElementById('home-btn-indoor').addEventListener('click', () => navigateToTab('indoor'));
+  document.getElementById('home-btn-dash').addEventListener('click', () => navigateToTab('dashboard'));
 
   const loginPopupBtn = document.getElementById('home-btn-login-popup');
   if (loginPopupBtn) loginPopupBtn.addEventListener('click', () => openAuthModal(renderApp));
