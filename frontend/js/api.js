@@ -134,7 +134,7 @@ async function callClaude({ system, userText, imageBase64, imageMediaType, maxTo
   content.push({ type: 'text', text: userText });
   const body = {
     model: 'claude-sonnet-4-6',
-    max_tokens: maxTokens || 1000,
+    max_tokens: maxTokens || 1500,
     system: system,
     messages: [{ role: 'user', content }]
   };
@@ -152,7 +152,23 @@ function extractJSON(raw) {
   const first = cleaned.indexOf('{');
   const last = cleaned.lastIndexOf('}');
   if (first >= 0 && last > first) cleaned = cleaned.slice(first, last + 1);
-  return JSON.parse(cleaned);
+
+  // Replace unescaped literal newlines in quotes
+  cleaned = cleaned.replace(/"([^"\\]|\\.)*"/g, (match) => {
+    return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
+  });
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    // Attempt trailing comma cleanup
+    try {
+      const sanitized = cleaned.replace(/,\s*([}\]])/g, '$1');
+      return JSON.parse(sanitized);
+    } catch (e2) {
+      throw new Error('AI returned invalid JSON: ' + e.message);
+    }
+  }
 }
 
 export async function analyzeOutdoorPhoto(base64, mediaType) {
@@ -172,7 +188,7 @@ export async function analyzeOutdoorPhoto(base64, mediaType) {
   const raw = await callClaude({
     system: OUTDOOR_SYSTEM_PROMPT,
     userText: 'Analyze this electrical hazard photo and return the JSON described in your instructions.',
-    imageBase64: base64, imageMediaType: mediaType, maxTokens: 700
+    imageBase64: base64, imageMediaType: mediaType, maxTokens: 1500
   });
   return extractJSON(raw);
 }
@@ -194,7 +210,7 @@ export async function analyzeIndoorPhoto(base64, mediaType) {
   const raw = await callClaude({
     system: INDOOR_SYSTEM_PROMPT,
     userText: 'Triage this indoor electrical photo and return the JSON described in your instructions.',
-    imageBase64: base64, imageMediaType: mediaType, maxTokens: 700
+    imageBase64: base64, imageMediaType: mediaType, maxTokens: 1500
   });
   return extractJSON(raw);
 }
