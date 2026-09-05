@@ -7,32 +7,45 @@ from backend.app.core.config import GEMINI_API_KEY, GEMINI_URL
 
 OUTDOOR_SYSTEM = """You are the diagnostic AI engine for ElectroGuard AI, a civic electrical-hazard reporting platform.
 You will be shown a citizen-submitted photo of a possible electrical/grid fault (poles, transformers, wires, meters, panels).
-Respond with STRICT JSON ONLY, no markdown fences, no prose outside the JSON, matching exactly this shape:
+
+STRICT AUTHENTICITY EVALUATION RULES:
+1. Carefully inspect the photo to verify if it is a genuine, live, real-world photograph of actual electrical infrastructure equipment (utility poles, transformers, power lines, meters, panels, circuit breakers, sub-station hardware).
+2. If the image is a photo of a computer/mobile screen, a digital drawing/sketch, an AI-generated image, meme, text, or does NOT contain real electrical grid equipment (e.g. pets, people, furniture, landscapes, cars), YOU MUST SET "is_real_photo": false.
+3. If "is_real_photo" is false:
+   - Set "validation_notes" to a direct explanation (e.g., "Photo is a screen capture of a computer monitor", "No electrical grid equipment detected in image", "Image is a non-electrical object/drawing").
+   - Set "fault_category" to "Not Electrical".
+   - Set "severity" to "Low".
+   - Set "safety_advisory" to "No electrical hazard detected. Submission failed authenticity check."
+
+Respond with STRICT JSON ONLY, matching exactly this shape:
 {
- "is_real_photo": true,
- "validation_notes": "Genuine photograph of a public utility pole with loose transformer wiring.",
- "fault_category": "Public Utility Grid",
- "identified_equipment": "Distribution Pole & Step-Down Transformer",
- "fault_type": "Sparking Feeder Wire & Insulator Damage",
- "severity": "High",
- "manpower": "3 Linesmen, 1 Safety Supervisor",
- "heavy_equipment": "Insulated Bucket Truck",
- "tools_and_parts": "25kV Surge Arrester, Rubber Shielding, Line Clamp",
- "safety_advisory": "Keep 10 metres back. Do not approach standing water near the base of the pole."
-}
-Be technical, concise, and safety-first. If the image is not a genuine photo of real electrical equipment, set is_real_photo to false, explain briefly in validation_notes, and still fill the other fields with your best-effort assessment or "N/A"."""
+ "is_real_photo": boolean,
+ "validation_notes": string,
+ "fault_category": "Public Utility Grid" | "Indoor/Residential" | "Not Electrical",
+ "identified_equipment": string,
+ "fault_type": string,
+ "severity": "Low" | "Moderate" | "High" | "Emergency",
+ "manpower": string,
+ "heavy_equipment": string,
+ "tools_and_parts": string,
+ "safety_advisory": string
+}"""
 
 INDOOR_SYSTEM = """You are the indoor triage AI engine for ElectroGuard AI.
 You will be shown a photo of a home electrical issue (breaker panel, socket, wiring, appliance).
-Respond with STRICT JSON ONLY, no markdown fences, matching exactly this shape:
+
+STRICT AUTHENTICITY RULES:
+1. Verify if the photo is a real home electrical issue. If it's a photo of a screen, drawing, non-electrical item, or meme, set "is_real_photo": false and explain in validation_notes.
+
+Respond with STRICT JSON ONLY, matching exactly this shape:
 {
- "is_real_photo": true,
- "validation_notes": "Genuine photo of a wall power socket.",
- "identified_issue": "Tripped MCB Circuit Breaker",
- "risk_level": "Low",
- "reasoning": "No visible smoke, scorching, or melted plastic observed on panel.",
- "diy_steps": ["Locate your main distribution panel", "Identify the tripped breaker switch in OFF position", "Switch it firmly back to the ON position"],
- "emergency_message": ""
+ "is_real_photo": boolean,
+ "validation_notes": string,
+ "identified_issue": string,
+ "risk_level": "Low" | "High",
+ "reasoning": string,
+ "diy_steps": [string, string, string],
+ "emergency_message": string
 }
 Use risk_level "Low" only for clearly safe, reversible issues like a tripped breaker or a loose plug. Use "High" for anything involving scorching, burning smell, sparking, exposed live wire, or visible fire risk.
 If risk_level is "Low", diy_steps must contain exactly 3 short, safe, actionable steps and emergency_message should be an empty string.
@@ -66,7 +79,7 @@ def call_gemini(system: str, user_text: str, image_b64: Optional[str] = None,
             "generationConfig": {
                 "maxOutputTokens": max_tokens,
                 "responseMimeType": "application/json",
-                "temperature": 0.2
+                "temperature": 0.1
             }
         },
         timeout=60,
@@ -82,7 +95,6 @@ def call_gemini(system: str, user_text: str, image_b64: Optional[str] = None,
 
 
 def clean_json_string(raw: str) -> str:
-    """Cleans markdown fences, control characters, and unescaped newlines inside JSON strings."""
     if not raw:
         return ""
     cleaned = raw.strip()
@@ -94,7 +106,6 @@ def clean_json_string(raw: str) -> str:
     if first >= 0 and last > first:
         cleaned = cleaned[first:last + 1]
 
-    # Fix unescaped newlines and tabs inside quoted string literals
     def fix_newlines_in_quotes(match):
         s = match.group(0)
         s = s.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
@@ -110,20 +121,17 @@ def extract_json(raw: str) -> dict:
     
     cleaned = clean_json_string(raw)
 
-    # First attempt: direct JSON load
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError:
         pass
 
-    # Second attempt: remove invalid trailing commas or control characters
     try:
         sanitized = re.sub(r",\s*([}\]])", r"\1", cleaned)
         return json.loads(sanitized)
     except json.JSONDecodeError:
         pass
 
-    # Third attempt: repair truncated string quotes
     try:
         repaired = cleaned
         if not repaired.endswith("}"):

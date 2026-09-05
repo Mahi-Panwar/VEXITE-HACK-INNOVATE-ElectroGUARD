@@ -19,6 +19,9 @@ let reportDraft = {
 
 export function renderReport(container) {
   const d = reportDraft;
+  const isFailed = d.analysis && !d.analysis.is_real_photo;
+  const isVerified = d.analysis && d.analysis.is_real_photo;
+
   container.innerHTML = `
     <h2 class="section-title">Report a grid fault</h2>
     <p class="section-sub">Capture the hazard from a safe distance. The AR overlay marks a 10-metre keep-back boundary while ElectroGuard AI verifies the photo and works out exactly what a repair crew needs to bring.</p>
@@ -41,13 +44,26 @@ export function renderReport(container) {
               <b>Tap to capture or upload a photo</b>
               <span>Downed poles, sparking wires, transformers, meters</span>
             </div>`}
+          
           ${d.preview && d.arArmed ? `
             <div class="ar-overlay">
-              <div class="ar-corner-frame c1"></div><div class="ar-corner-frame c2"></div>
-              <div class="ar-corner-frame c3"></div><div class="ar-corner-frame c4"></div>
-              <div class="ar-readout">AR SAFETY BUBBLE · ARMED</div>
-              <div class="ar-danger-ring"></div>
-              <div class="ar-danger-label">DANGER ZONE — KEEP 10M BACK</div>
+              <div class="ar-corner-frame c1" style="${isFailed ? 'border-color:var(--red)' : ''}"></div>
+              <div class="ar-corner-frame c2" style="${isFailed ? 'border-color:var(--red)' : ''}"></div>
+              <div class="ar-corner-frame c3" style="${isFailed ? 'border-color:var(--red)' : ''}"></div>
+              <div class="ar-corner-frame c4" style="${isFailed ? 'border-color:var(--red)' : ''}"></div>
+              
+              ${isFailed ? `
+                <div class="ar-readout" style="color:var(--red);border-color:var(--red);background:rgba(232,73,93,0.15)">
+                  AUTHENTICITY CHECK FAILED
+                </div>
+                <div class="ar-danger-label" style="background:#5d6d78;box-shadow:none">
+                  ⛔ UNVERIFIED / FAKE PHOTO REJECTED
+                </div>
+              ` : `
+                <div class="ar-readout">AR SAFETY BUBBLE · ${isVerified ? 'VERIFIED' : 'ARMED'}</div>
+                <div class="ar-danger-ring"></div>
+                <div class="ar-danger-label">DANGER ZONE — KEEP 10M BACK</div>
+              `}
             </div>` : ''}
         </div>
         <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none">
@@ -109,8 +125,11 @@ function renderAnalysisPanel(a, d) {
   if (!a.is_real_photo) {
     return `
       <div class="badge badge-high" style="margin-bottom:12px">${icon('x')} AUTHENTICITY FAILED</div>
-      <p style="font-size:14px;color:var(--text-muted);line-height:1.6">${a.validation_notes || 'This image could not be verified as a genuine electrical hazard photo.'}</p>
-      <p style="font-size:13px;color:var(--text-dim);margin-top:14px">Reports must be a real, live photo of the hazard. Fake or duplicate submissions are automatically filtered so crews aren't dispatched on false alerts.</p>
+      <div style="background:var(--red-soft);border:1px solid var(--red);padding:14px;border-radius:6px;margin-bottom:14px">
+        <b style="color:var(--red);display:block;margin-bottom:4px">⛔ Report Submission Blocked</b>
+        <p style="font-size:13.5px;color:var(--text);margin:0;line-height:1.5">${a.validation_notes || 'This image could not be verified as a genuine electrical hazard photo.'}</p>
+      </div>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:14px">Reports must be a real, live photo of actual electrical equipment. Screen captures, illustrations, non-electrical items, or AI-generated images are automatically rejected to prevent false utility crew dispatches.</p>
     `;
   }
   const sevClass = { 'Low': 'badge-low', 'Moderate': 'badge-moderate', 'High': 'badge-high', 'Emergency': 'badge-emergency' }[a.severity] || 'badge-moderate';
