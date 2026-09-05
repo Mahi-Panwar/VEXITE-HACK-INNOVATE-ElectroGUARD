@@ -52,6 +52,9 @@ If risk_level is "Low", diy_steps must contain exactly 3 short, safe, actionable
 If risk_level is "High", emergency_message must be a firm one-sentence instruction to cut power at the main breaker immediately, and diy_steps can be an empty array."""
 
 
+from backend.app.core.config import GEMINI_API_KEY, GEMINI_URL, GEMINI_MODEL, GEMINI_FALLBACK_MODELS
+
+
 def call_gemini(system: str, user_text: str, image_b64: Optional[str] = None,
                  media_type: Optional[str] = None, max_tokens: int = 1500) -> str:
     if not GEMINI_API_KEY:
@@ -70,28 +73,42 @@ def call_gemini(system: str, user_text: str, image_b64: Optional[str] = None,
         })
     parts.append({"text": user_text})
 
-    resp = requests.post(
-        GEMINI_URL,
-        headers={"Content-Type": "application/json"},
-        json={
-            "contents": [{"parts": parts}],
-            "systemInstruction": {"parts": [{"text": system}]},
-            "generationConfig": {
-                "maxOutputTokens": max_tokens,
-                "responseMimeType": "application/json",
-                "temperature": 0.1
-            }
-        },
-        timeout=60,
-    )
-    if resp.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"Gemini API error: {resp.status_code} {resp.text[:300]}")
-    data = resp.json()
-    try:
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
-        return text.strip()
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Unexpected Gemini response structure: {str(e)}")
+    # Prepare model cascade URLs
+    models_to_try = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
+    urls = []
+    for model in models_to_try:
+        urls.append(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}")
+
+    last_error_text = ""
+    for url in urls:
+        resp = requests.post(
+            url,
+            headers={"Content-Type": "application/json"},
+            json={
+                "contents": [{"parts": parts}],
+                "systemInstruction": {"parts": [{"text": system}]},
+                "generationConfig": {
+                    "maxOutputTokens": max_tokens,
+                    "responseMimeType": "application/json",
+                    "temperature": 0.1
+                }
+            },
+            timeout=60,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            try:
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+                return text.strip()
+            except Exception as e:
+                raise HTTPException(status_code=502, detail=f"Unexpected Gemini response structure: {str(e)}")
+        elif resp.status_code in (429, 404):
+            last_error_text = f"HTTP {resp.status_code}: {resp.text[:300]}"
+            continue
+        else:
+            raise HTTPException(status_code=502, detail=f"Gemini API error: {resp.status_code} {resp.text[:300]}")
+
+    raise HTTPException(status_code=502, detail=f"All Gemini models exhausted or rate-limited: {last_error_text}")
 
 
 def clean_json_string(raw: str) -> str:

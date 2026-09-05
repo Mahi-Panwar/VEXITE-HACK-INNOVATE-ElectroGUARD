@@ -8,7 +8,8 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 
 DB_PATH = os.environ.get("DB_PATH", os.path.join(ROOT_DIR, "electroguard.db"))
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_FALLBACK_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2.5-flash"]
 
 CUSTOM_GEMINI_URL = os.environ.get("GEMINI_URL", "").strip()
 
