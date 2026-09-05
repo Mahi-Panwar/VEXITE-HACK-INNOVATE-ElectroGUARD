@@ -1,53 +1,63 @@
 import { state } from '../state.js';
 import { icon } from '../icons.js';
-import { SECTORS, SECTOR_COORDS, SECTOR_MAP } from '../config.js';
+import { SECTORS, SECTOR_MAP, CITIES, getSectorCoordsForCenter } from '../config.js';
 import { weatherState } from '../components/weather.js';
+import { toast } from '../utils.js';
 
 let mapInstance = null;
 let currentFilter = 'All';
+let mapCenter = { lat: 28.6139, lng: 77.2090, cityName: 'Delhi NCR' }; // Default to Delhi NCR or GPS
+let isGpsActive = false;
 
 export function renderMap(container, navigateToTab) {
   const reportsCount = state.reports.length;
   const emergenciesCount = state.reports.filter(r => r.severity === 'Emergency').length;
+  const sectorCoords = getSectorCoordsForCenter(mapCenter.lat, mapCenter.lng);
 
   container.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
       <div>
-        <h2 class="section-title" style="margin:0">Interactive Grid Hazard Map</h2>
-        <p class="section-sub" style="margin:0">Real-time geospatial visualization of reported hazards, sub-station sectors, and live risk perimeters.</p>
+        <h2 class="section-title" style="margin:0">Global Grid Hazard Map</h2>
+        <p class="section-sub" style="margin:0">Real-time geospatial visualization of reported hazards, sub-station sectors, and live risk perimeters worldwide.</p>
       </div>
       <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" id="map-btn-gps">${icon('warn')} Detect My GPS Location</button>
         <button class="btn btn-primary" id="map-btn-report">${icon('camera')} Report New Hazard</button>
       </div>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- Filter & City Selector Bar -->
     <div class="card" style="margin-bottom:18px;padding:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:12.5px;color:var(--text-muted);font-weight:600">Filter Pins:</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:12.5px;color:var(--text-muted);font-weight:600">Select City / Region:</span>
+          <select id="map-city-select" style="width:auto;max-width:220px;padding:6px 10px;font-size:13px">
+            ${CITIES.map(c => `<option value="${c.name}" ${mapCenter.cityName === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}
+          </select>
+
+          <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;margin-left:10px">Pins Filter:</span>
           <button class="btn ${currentFilter === 'All' ? 'btn-primary' : 'btn-ghost'}" id="map-filter-all" style="padding:5px 12px;font-size:12.5px">All (${reportsCount})</button>
           <button class="btn ${currentFilter === 'Emergency' ? 'btn-danger' : 'btn-ghost'}" id="map-filter-emergency" style="padding:5px 12px;font-size:12.5px">Emergency (${emergenciesCount})</button>
           <button class="btn ${currentFilter === 'High' ? 'btn-primary' : 'btn-ghost'}" id="map-filter-high" style="padding:5px 12px;font-size:12.5px">High Risk</button>
         </div>
 
         <div style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono)">
-          📍 Metro Center: Indore (22.7196° N, 75.8577° E)
+          📍 Active Center: <b>${mapCenter.cityName}</b> (${mapCenter.lat.toFixed(4)}° N, ${mapCenter.lng.toFixed(4)}° E)
         </div>
       </div>
     </div>
 
     <!-- Leaflet Map Canvas -->
     <div class="card" style="padding:8px">
-      <div id="leaflet-hazard-map" style="height:500px;width:100%;border-radius:6px;overflow:hidden;z-index:1"></div>
+      <div id="leaflet-hazard-map" style="height:520px;width:100%;border-radius:6px;overflow:hidden;z-index:1"></div>
     </div>
 
     <!-- Sector Risk Summary Grid -->
     <div style="margin-top:22px">
-      <h3 style="font-family:var(--font-display);font-size:18px;margin:0 0 12px">Substation Sector Risk Status</h3>
+      <h3 style="font-family:var(--font-display);font-size:18px;margin:0 0 12px">Substation Sector Status — ${mapCenter.cityName}</h3>
       <div class="grid-3">
         ${SECTORS.map(s => {
-          const coords = SECTOR_COORDS[s];
+          const coords = sectorCoords[s];
           const sectorReports = state.reports.filter(r => r.sector === s);
           const hasEmergency = sectorReports.some(r => r.severity === 'Emergency');
           const color = hasEmergency || weatherState.isStormSimulated ? 'var(--red)' : sectorReports.length ? 'var(--amber)' : 'var(--green)';
@@ -67,16 +77,54 @@ export function renderMap(container, navigateToTab) {
   `;
 
   document.getElementById('map-btn-report').addEventListener('click', () => navigateToTab('report'));
+  document.getElementById('map-btn-gps').addEventListener('click', () => triggerGpsLocation(container, navigateToTab));
+
+  document.getElementById('map-city-select').addEventListener('change', e => {
+    const selectedName = e.target.value;
+    if (selectedName === 'My Live GPS Location') {
+      triggerGpsLocation(container, navigateToTab);
+    } else {
+      const found = CITIES.find(c => c.name === selectedName);
+      if (found && found.lat) {
+        mapCenter = { lat: found.lat, lng: found.lng, cityName: found.name };
+        renderMap(container, navigateToTab);
+      }
+    }
+  });
 
   document.getElementById('map-filter-all').addEventListener('click', () => { currentFilter = 'All'; renderMap(container, navigateToTab); });
   document.getElementById('map-filter-emergency').addEventListener('click', () => { currentFilter = 'Emergency'; renderMap(container, navigateToTab); });
   document.getElementById('map-filter-high').addEventListener('click', () => { currentFilter = 'High'; renderMap(container, navigateToTab); });
 
   // Initialize Leaflet Map
-  setTimeout(() => initLeafletMap(), 100);
+  setTimeout(() => initLeafletMap(sectorCoords), 100);
 }
 
-function initLeafletMap() {
+function triggerGpsLocation(container, navigateToTab) {
+  if (!navigator.geolocation) {
+    toast('GPS Geolocation unavailable on browser.', 'warn');
+    return;
+  }
+  toast('Detecting your live GPS location…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      mapCenter = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        cityName: 'My Live GPS Area'
+      };
+      isGpsActive = true;
+      renderMap(container, navigateToTab);
+      toast('Map centered on your live GPS location!', 'ok');
+    },
+    err => {
+      toast('GPS access denied. Showing selected metro area.', 'warn');
+    },
+    { timeout: 8000 }
+  );
+}
+
+function initLeafletMap(sectorCoords) {
   const mapEl = document.getElementById('leaflet-hazard-map');
   if (!mapEl || typeof L === 'undefined') return;
 
@@ -85,7 +133,7 @@ function initLeafletMap() {
     mapInstance = null;
   }
 
-  const center = [22.7196, 75.8577];
+  const center = [mapCenter.lat, mapCenter.lng];
   mapInstance = L.map('leaflet-hazard-map').setView(center, 12);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -95,7 +143,7 @@ function initLeafletMap() {
 
   // Add Sector Zone Circles
   SECTORS.forEach(s => {
-    const coords = SECTOR_COORDS[s];
+    const coords = sectorCoords[s];
     if (coords) {
       const sectorReports = state.reports.filter(r => r.sector === s);
       const isHighRisk = sectorReports.some(r => r.severity === 'Emergency' || r.severity === 'High') || weatherState.isStormSimulated;

@@ -28,14 +28,27 @@ export const SECTOR_MAP = {
   'Sector 6': 'Sector 6 — West Suburban (Substation E)'
 };
 
-export const SECTOR_COORDS = {
-  'Sector 1': { lat: 22.7500, lng: 75.8600, label: 'North Substation A' },
-  'Sector 2': { lat: 22.7300, lng: 75.8900, label: 'East Commercial Grid' },
-  'Sector 3': { lat: 22.7196, lng: 75.8577, label: 'Central Core Grid' },
-  'Sector 4': { lat: 22.6900, lng: 75.8700, label: 'Industrial High-Voltage Zone' },
-  'Sector 5': { lat: 22.6800, lng: 75.8300, label: 'South Residential Grid' },
-  'Sector 6': { lat: 22.7200, lng: 75.8100, label: 'West Suburban Substation' },
-};
+export const CITIES = [
+  { name: 'My Live GPS Location', lat: null, lng: null },
+  { name: 'Delhi NCR', lat: 28.6139, lng: 77.2090 },
+  { name: 'Mumbai Metro', lat: 19.0760, lng: 72.8777 },
+  { name: 'Bengaluru Tech Grid', lat: 12.9716, lng: 77.5946 },
+  { name: 'Hyderabad Metro', lat: 17.3850, lng: 78.4867 },
+  { name: 'Indore Metro', lat: 22.7196, lng: 75.8577 },
+  { name: 'London Grid', lat: 51.5074, lng: -0.1278 },
+  { name: 'New York Grid', lat: 40.7128, lng: -74.0060 }
+];
+
+export function getSectorCoordsForCenter(centerLat, centerLng) {
+  return {
+    'Sector 1': { lat: centerLat + 0.035, lng: centerLng + 0.005, label: 'North Substation A' },
+    'Sector 2': { lat: centerLat + 0.015, lng: centerLng + 0.035, label: 'East Commercial Grid' },
+    'Sector 3': { lat: centerLat, lng: centerLng, label: 'Central Core Grid' },
+    'Sector 4': { lat: centerLat - 0.030, lng: centerLng + 0.015, label: 'Industrial High-Voltage Zone' },
+    'Sector 5': { lat: centerLat - 0.040, lng: centerLng - 0.025, label: 'South Residential Grid' },
+    'Sector 6': { lat: centerLat + 0.005, lng: centerLng - 0.045, label: 'West Suburban Substation' },
+  };
+}
 
 export const ELECTRICIANS = [
   { name: 'Rekha Patel — Certified Electrician', rating: 4.9, eta: '22 min', price: '₹450 call-out' },
