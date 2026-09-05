@@ -6,7 +6,7 @@ import { toast } from '../utils.js';
 
 let mapInstance = null;
 let currentFilter = 'All';
-let mapCenter = { lat: 28.6139, lng: 77.2090, cityName: 'Delhi NCR' }; // Default to Delhi NCR or GPS
+let mapCenter = { lat: 23.2599, lng: 77.4126, cityName: 'Bhopal Metro' }; // Default to Bhopal Metro
 let isGpsActive = false;
 
 export function renderMap(container, navigateToTab) {

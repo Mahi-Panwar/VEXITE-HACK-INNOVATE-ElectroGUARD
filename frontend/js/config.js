@@ -30,11 +30,12 @@ export const SECTOR_MAP = {
 
 export const CITIES = [
   { name: 'My Live GPS Location', lat: null, lng: null },
+  { name: 'Bhopal Metro', lat: 23.2599, lng: 77.4126 },
+  { name: 'Indore Metro', lat: 22.7196, lng: 75.8577 },
   { name: 'Delhi NCR', lat: 28.6139, lng: 77.2090 },
   { name: 'Mumbai Metro', lat: 19.0760, lng: 72.8777 },
   { name: 'Bengaluru Tech Grid', lat: 12.9716, lng: 77.5946 },
   { name: 'Hyderabad Metro', lat: 17.3850, lng: 78.4867 },
-  { name: 'Indore Metro', lat: 22.7196, lng: 75.8577 },
   { name: 'London Grid', lat: 51.5074, lng: -0.1278 },
   { name: 'New York Grid', lat: 40.7128, lng: -74.0060 }
 ];
