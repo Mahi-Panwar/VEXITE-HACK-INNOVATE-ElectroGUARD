@@ -4,9 +4,11 @@ import { state } from './state.js';
 import { toast } from './utils.js';
 import { loadPersonal, loadBackendUrl, loadShared, setBackendUrl, updateBackendChip } from './api.js';
 import { openAuthModal, closeAuthModal } from './components/modal.js';
+import { renderWeatherTicker } from './components/weather.js';
 
 import { renderHome } from './views/home.js';
 import { renderDashboard } from './views/dashboard.js';
+import { renderMap } from './views/map.js';
 import { renderLogin } from './views/login.js';
 import { renderReport } from './views/report.js';
 import { renderIndoor } from './views/indoor.js';
@@ -54,6 +56,7 @@ function updateUserBadge() {
 export function render() {
   renderSidebar();
   updateUserBadge();
+  renderWeatherTicker();
   const c = document.getElementById('content');
   if (!c) return;
 
@@ -64,6 +67,7 @@ export function render() {
 
   if (state.tab === 'home') return renderHome(c, navigateToTab, render);
   if (state.tab === 'dashboard') return renderDashboard(c, navigateToTab, render);
+  if (state.tab === 'map') return renderMap(c, navigateToTab);
   if (state.tab === 'login') return renderLogin(c, navigateToTab);
   if (state.tab === 'report') return renderReport(c);
   if (state.tab === 'indoor') return renderIndoor(c);

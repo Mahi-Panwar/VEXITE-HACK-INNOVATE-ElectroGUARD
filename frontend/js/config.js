@@ -1,6 +1,7 @@
 export const TABS = [
   { id: 'home', label: 'Home', icon: 'home' },
   { id: 'dashboard', label: 'My Dashboard', icon: 'grid' },
+  { id: 'map', label: 'Grid Hazard Map', icon: 'map' },
   { id: 'login', label: 'Login / Account', icon: 'user' },
   { id: 'report', label: 'Report Fault', icon: 'camera' },
   { id: 'indoor', label: 'Indoor Assistant', icon: 'plug' },
@@ -25,6 +26,15 @@ export const SECTOR_MAP = {
   'Sector 4': 'Sector 4 — Industrial Zone (High Voltage)',
   'Sector 5': 'Sector 5 — South Residential (Substation D)',
   'Sector 6': 'Sector 6 — West Suburban (Substation E)'
+};
+
+export const SECTOR_COORDS = {
+  'Sector 1': { lat: 22.7500, lng: 75.8600, label: 'North Substation A' },
+  'Sector 2': { lat: 22.7300, lng: 75.8900, label: 'East Commercial Grid' },
+  'Sector 3': { lat: 22.7196, lng: 75.8577, label: 'Central Core Grid' },
+  'Sector 4': { lat: 22.6900, lng: 75.8700, label: 'Industrial High-Voltage Zone' },
+  'Sector 5': { lat: 22.6800, lng: 75.8300, label: 'South Residential Grid' },
+  'Sector 6': { lat: 22.7200, lng: 75.8100, label: 'West Suburban Substation' },
 };
 
 export const ELECTRICIANS = [
