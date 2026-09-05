@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>ElectroGuard AI — Report Any Fault. Dispatch Instantly. Predict Outages.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/components.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1a1204" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>ElectroGuard AI</h1>
+        <p>Report Any Fault. Dispatch Instantly. Predict Outages. Zero Delay.</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="status-chip" id="user-session-chip" style="border:1px solid var(--border);background:var(--bg-elevated);cursor:pointer">
+        <span>Citizen User</span>
+      </button>
+      <button class="status-chip" id="backend-chip" style="border:1px solid var(--border);background:var(--bg-elevated)">
+        <span class="status-dot" id="backend-dot"></span> 
+        <span id="backend-label">GRID LINK ACTIVE</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <main id="content"></main>
+</div>
+<div id="toast-container"></div>
+
+<script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
