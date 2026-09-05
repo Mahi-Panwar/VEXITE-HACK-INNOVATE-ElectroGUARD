@@ -1,6 +1,6 @@
 import { state, awardPoints } from '../state.js';
 import { icon } from '../icons.js';
-import { SECTORS } from '../config.js';
+import { SECTORS, SECTOR_MAP } from '../config.js';
 import { toast, haversine, randomCoordNearIndore, compressImage } from '../utils.js';
 import { analyzeOutdoorPhoto, loadShared, saveReports, saveLeaderboard } from '../api.js';
 
@@ -22,6 +22,16 @@ export function renderReport(container) {
   container.innerHTML = `
     <h2 class="section-title">Report a grid fault</h2>
     <p class="section-sub">Capture the hazard from a safe distance. The AR overlay marks a 10-metre keep-back boundary while ElectroGuard AI verifies the photo and works out exactly what a repair crew needs to bring.</p>
+    
+    <!-- Sector Identification Helper Box -->
+    <div style="background:var(--bg-elevated);border:1px solid var(--border-bright);padding:12px 16px;border-radius:6px;margin-bottom:18px;display:flex;align-items:center;gap:12px;font-size:13px">
+      <span style="color:var(--amber);font-size:18px">📍</span>
+      <div>
+        <b style="color:var(--text);display:block;margin-bottom:2px">How to identify your Grid Sector?</b>
+        <span style="color:var(--text-muted)">Click <b>"Use GPS"</b> to auto-detect your location, or select your city power zone below (Sector 1 = North, Sector 2 = East, Sector 3 = Central Metro, Sector 4 = Industrial, Sector 5 = South, Sector 6 = West).</span>
+      </div>
+    </div>
+
     <div class="grid-2">
       <div class="card">
         <div id="capture-zone" class="capture-zone ${d.preview ? 'has-image' : ''}">
@@ -49,7 +59,7 @@ export function renderReport(container) {
         </div>
 
         <div style="margin-top:16px">
-          <label class="field-label">Location</label>
+          <label class="field-label">Location Tag</label>
           <div style="display:flex;gap:8px;">
             <input type="text" id="loc-display" readonly value="${d.coords ? d.coords.lat.toFixed(5) + ', ' + d.coords.lng.toFixed(5) : 'Not tagged yet'}" style="flex:1">
             <button class="btn" id="btn-geo">${icon('warn')} Use GPS</button>
@@ -57,8 +67,10 @@ export function renderReport(container) {
         </div>
 
         <div style="margin-top:16px">
-          <label class="field-label">Sector</label>
-          <select id="sector-select">${SECTORS.map(s => `<option ${d.sector === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
+          <label class="field-label">Power Distribution Sector</label>
+          <select id="sector-select">
+            ${SECTORS.map(s => `<option value="${s}" ${d.sector === s ? 'selected' : ''}>${SECTOR_MAP[s] || s}</option>`).join('')}
+          </select>
         </div>
 
         <button class="btn btn-primary" id="btn-analyze" style="margin-top:18px;width:100%" ${!d.preview || d.analyzing ? 'disabled' : ''}>

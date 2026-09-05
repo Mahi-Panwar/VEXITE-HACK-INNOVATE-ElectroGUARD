@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { icon } from '../icons.js';
-import { SECTORS } from '../config.js';
+import { SECTORS, SECTOR_MAP } from '../config.js';
 import { toast } from '../utils.js';
 
 let predictState = {
@@ -30,25 +30,36 @@ export function renderPredict(container) {
   container.innerHTML = `
     <h2 class="section-title">Predictive outage engine</h2>
     <p class="section-sub">Correlates live weather with micro-fault density per sector to forecast blackout risk before the grid fails.</p>
+
+    <!-- Sector Guide Banner -->
+    <div style="background:var(--bg-elevated);border:1px solid var(--border-bright);padding:12px 16px;border-radius:6px;margin-bottom:18px;font-size:13px;color:var(--text-muted)">
+      <b style="color:var(--amber);display:block;margin-bottom:2px">🧭 City Power Grid Sectors Guide:</b>
+      <span>Sectors 1-6 subdivide the metro grid into regional substations (Sector 1: North, Sector 2: East, Sector 3: Central, Sector 4: Industrial, Sector 5: South, Sector 6: West). Select a zone to evaluate its live outage vulnerability score.</span>
+    </div>
+
     <div class="grid-2">
       <div class="card">
         <label class="field-label">Wind speed — ${p.wind} km/h</label>
         <input type="range" id="wind-range" min="0" max="120" value="${p.wind}">
         <label class="field-label" style="margin-top:16px">Rainfall — ${p.rain} mm/hr</label>
         <input type="range" id="rain-range" min="0" max="40" value="${p.rain}">
-        <label class="field-label" style="margin-top:16px">Sector</label>
-        <select id="predict-sector">${SECTORS.map(s => `<option ${p.sector === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
+        <label class="field-label" style="margin-top:16px">Power Distribution Sector</label>
+        <select id="predict-sector">
+          ${SECTORS.map(s => `<option value="${s}" ${p.sector === s ? 'selected' : ''}>${SECTOR_MAP[s] || s}</option>`).join('')}
+        </select>
 
         <div class="sector-grid">
           ${SECTORS.map(s => {
             const cnt = state.reports.filter(r => r.sector === s).length;
-            return `<div class="sector-tile ${s === p.sector ? 'selected' : ''}" data-sector="${s}"><b>${cnt}</b><span>${s}</span></div>`;
+            const label = s.replace('Sector ', 'S');
+            return `<div class="sector-tile ${s === p.sector ? 'selected' : ''}" data-sector="${s}"><b>${cnt}</b><span>${label}</span></div>`;
           }).join('')}
         </div>
       </div>
+
       <div class="card">
         <span class="badge badge-teal" style="margin-bottom:10px">${icon('sun')} LIVE MODEL</span>
-        <h3 style="font-family:var(--font-display);font-size:19px;margin:6px 0 2px">${p.sector}</h3>
+        <h3 style="font-family:var(--font-display);font-size:19px;margin:6px 0 2px">${SECTOR_MAP[p.sector] || p.sector}</h3>
         <p style="color:var(--text-muted);font-size:13px;margin:0 0 4px">${faultCount} micro-fault report${faultCount === 1 ? '' : 's'} on file for this sector</p>
         <div class="risk-meter"><div class="risk-meter-fill" style="width:${total}%;background:${color}"></div></div>
         <div style="display:flex;justify-content:space-between;align-items:baseline">
@@ -93,7 +104,7 @@ async function generateBriefing(container) {
       if (!res.ok) throw new Error(out.detail || 'Backend error');
       p.briefing = out.briefing;
     } else {
-      p.briefing = `Recommend pre-dispatching crew to ${p.sector}. ${faultCount} micro-faults coupled with ${p.wind} km/h winds elevate blackout probability to ${total}%. Secure loose feeders and position boom crane at primary substation.`;
+      p.briefing = `Recommend pre-dispatching crew to ${SECTOR_MAP[p.sector] || p.sector}. ${faultCount} micro-faults coupled with ${p.wind} km/h winds elevate blackout probability to ${total}%. Secure loose feeders and position boom crane at primary substation.`;
     }
   } catch (err) {
     toast(err.message || 'Could not generate briefing.', 'warn');

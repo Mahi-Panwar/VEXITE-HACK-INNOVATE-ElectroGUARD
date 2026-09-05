@@ -17,10 +17,19 @@ export const SECTORS = [
   'Sector 6'
 ];
 
+export const SECTOR_MAP = {
+  'Sector 1': 'Sector 1 — North Zone (Substation A)',
+  'Sector 2': 'Sector 2 — East Zone (Commercial Grid)',
+  'Sector 3': 'Sector 3 — Central Metro (Core Grid)',
+  'Sector 4': 'Sector 4 — Industrial Zone (High Voltage)',
+  'Sector 5': 'Sector 5 — South Residential (Substation D)',
+  'Sector 6': 'Sector 6 — West Suburban (Substation E)'
+};
+
 export const ELECTRICIANS = [
   { name: 'Rekha Patel — Certified Electrician', rating: 4.9, eta: '22 min', price: '₹450 call-out' },
   { name: 'Vikram Singh Electricals', rating: 4.7, eta: '35 min', price: '₹400 call-out' },
-  { name: 'SafeCircuit Home Services', rating: 4.6, eta: '500 call-out' },
+  { name: 'SafeCircuit Home Services', rating: 4.6, eta: '40 min', price: '₹500 call-out' },
 ];
 
 export const OUTDOOR_SYSTEM_PROMPT = `You are the diagnostic AI engine for ElectroGuard AI, a civic electrical-hazard reporting platform.
