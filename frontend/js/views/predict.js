@@ -34,7 +34,7 @@ export function renderPredict(container) {
     <!-- Sector Guide Banner -->
     <div style="background:var(--bg-elevated);border:1px solid var(--border-bright);padding:12px 16px;border-radius:6px;margin-bottom:18px;font-size:13px;color:var(--text-muted)">
       <b style="color:var(--amber);display:block;margin-bottom:2px">🧭 City Power Grid Sectors Guide:</b>
-      <span>Sectors 1-6 subdivide the metro grid into regional substations (Sector 1: North, Sector 2: East, Sector 3: Central, Sector 4: Industrial, Sector 5: South, Sector 6: West). Select a zone to evaluate its live outage vulnerability score.</span>
+      <span>Sectors 1-6 subdivide the city electrical grid into regional substations (Sector 1: North, Sector 2: East, Sector 3: Central, Sector 4: Industrial, Sector 5: South, Sector 6: West). Select a zone to evaluate its live outage vulnerability score.</span>
     </div>
 
     <div class="grid-2">

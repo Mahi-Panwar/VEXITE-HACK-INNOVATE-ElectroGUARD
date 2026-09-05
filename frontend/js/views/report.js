@@ -31,7 +31,7 @@ export function renderReport(container) {
       <span style="color:var(--amber);font-size:18px">📍</span>
       <div>
         <b style="color:var(--text);display:block;margin-bottom:2px">How to identify your Grid Sector?</b>
-        <span style="color:var(--text-muted)">Click <b>"Use GPS"</b> to auto-detect your location, or select your city power zone below (Sector 1 = North, Sector 2 = East, Sector 3 = Central Metro, Sector 4 = Industrial, Sector 5 = South, Sector 6 = West).</span>
+        <span style="color:var(--text-muted)">Click <b>"Use GPS"</b> to auto-detect your location, or select your city power zone below (Sector 1 = North, Sector 2 = East, Sector 3 = Central Grid, Sector 4 = Industrial, Sector 5 = South, Sector 6 = West).</span>
       </div>
     </div>
 

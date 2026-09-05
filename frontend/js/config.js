@@ -22,7 +22,7 @@ export const SECTORS = [
 export const SECTOR_MAP = {
   'Sector 1': 'Sector 1 — North Zone (Substation A)',
   'Sector 2': 'Sector 2 — East Zone (Commercial Grid)',
-  'Sector 3': 'Sector 3 — Central Metro (Core Grid)',
+  'Sector 3': 'Sector 3 — Central Grid (Core Electrical Zone)',
   'Sector 4': 'Sector 4 — Industrial Zone (High Voltage)',
   'Sector 5': 'Sector 5 — South Residential (Substation D)',
   'Sector 6': 'Sector 6 — West Suburban (Substation E)'
@@ -30,14 +30,14 @@ export const SECTOR_MAP = {
 
 export const CITIES = [
   { name: 'My Live GPS Location', lat: null, lng: null },
-  { name: 'Bhopal Metro', lat: 23.2599, lng: 77.4126 },
-  { name: 'Indore Metro', lat: 22.7196, lng: 75.8577 },
-  { name: 'Delhi NCR', lat: 28.6139, lng: 77.2090 },
-  { name: 'Mumbai Metro', lat: 19.0760, lng: 72.8777 },
-  { name: 'Bengaluru Tech Grid', lat: 12.9716, lng: 77.5946 },
-  { name: 'Hyderabad Metro', lat: 17.3850, lng: 78.4867 },
-  { name: 'London Grid', lat: 51.5074, lng: -0.1278 },
-  { name: 'New York Grid', lat: 40.7128, lng: -74.0060 }
+  { name: 'Bhopal Power Distribution Grid', lat: 23.2599, lng: 77.4126 },
+  { name: 'Indore Electrical Zone', lat: 22.7196, lng: 75.8577 },
+  { name: 'Delhi NCR Power Grid', lat: 28.6139, lng: 77.2090 },
+  { name: 'Mumbai Electrical Zone', lat: 19.0760, lng: 72.8777 },
+  { name: 'Bengaluru Power Grid', lat: 12.9716, lng: 77.5946 },
+  { name: 'Hyderabad Power Zone', lat: 17.3850, lng: 78.4867 },
+  { name: 'London Electrical Grid', lat: 51.5074, lng: -0.1278 },
+  { name: 'New York Power Grid', lat: 40.7128, lng: -74.0060 }
 ];
 
 export function getSectorCoordsForCenter(centerLat, centerLng) {

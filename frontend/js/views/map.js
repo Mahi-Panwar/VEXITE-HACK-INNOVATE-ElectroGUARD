@@ -6,7 +6,7 @@ import { toast } from '../utils.js';
 
 let mapInstance = null;
 let currentFilter = 'All';
-let mapCenter = { lat: 23.2599, lng: 77.4126, cityName: 'Bhopal Metro' }; // Default to Bhopal Metro
+let mapCenter = { lat: 23.2599, lng: 77.4126, cityName: 'Bhopal Power Distribution Grid' }; // Default to Bhopal Power Distribution Grid
 let isGpsActive = false;
 
 export function renderMap(container, navigateToTab) {
@@ -118,7 +118,7 @@ function triggerGpsLocation(container, navigateToTab) {
       toast('Map centered on your live GPS location!', 'ok');
     },
     err => {
-      toast('GPS access denied. Showing selected metro area.', 'warn');
+      toast('GPS access denied. Showing selected power grid area.', 'warn');
     },
     { timeout: 8000 }
   );
